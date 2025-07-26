@@ -322,7 +322,7 @@
             formData.append("style_img", new File([blob], SAMPLE_STYLE_IMAGES[selectedStyleIdx ?? 0].name));
           }
 
-          const response = await fetch("http://127.0.0.1:8000/stylize_img_upload", {
+          const response = await fetch("https://mranjanjena253-nst-api-fastapi.hf.space/stylize_img_upload", {
             method: "POST",
             body: formData
           });
