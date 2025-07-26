@@ -59,10 +59,10 @@ def stylize_img(img_path, style_path):
     # Requires grad specifies that the gradient descent or the optimisation will be done on the generated_image.
 
     # Setting The hyperparameters
-    epochs = 100
-    lr = 0.01
+    epochs = 5000
+    lr = 3e-3
     alpha = 1     # To be multiplied with the content loss.
-    beta = 0.001      # To be multiplied with the style loss.
+    beta = 0.0001      # To be multiplied with the style loss.
     # The alpha and beta determines how much of the structure from the original image or how much style do we need in the generated image.
     optimizer = torch.optim.Adam([generated_image], lr = lr)    # Generally we take model.params() as argument but here we need to freeze the model weights so, the loss optimisation will be done on the generated image rather than the model parameters.
 
@@ -88,6 +88,10 @@ def stylize_img(img_path, style_path):
         optimizer.step()
         if epoch % 200 == 0:
             print("Total loss = ", total_loss.item())
-    generated_image_path = "stylized_img.png"
+    generated_image_path = "Output_Image/Style_3_Scenery.png"
     save_image(generated_image, generated_image_path)
+    print("Final_Loss : ", total_loss.item())
     return generated_image_path
+
+stylize_img(img_path = "Images/Scenery.jpg",
+            style_path = "Styles/Style 3.png")
