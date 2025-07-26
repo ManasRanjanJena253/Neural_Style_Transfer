@@ -4,536 +4,602 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Neural Style Transfer: Where Deep Learning Meets Art</title>
-  <meta name="description" content="Neural Style Transfer using PyTorch – blending everyday images with iconic art styles. Curated gallery of AI-generated outputs."/>
-  <!-- Google Fonts: Poppins and Space Grotesk -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Rive CDN for interactive animations -->
-  <script src="https://unpkg.com/@rive-app/canvas@2.11.3/rive.min.js"></script>
-  <!-- React & ReactDOM (for browser, via CDN) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Babel for JSX support -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta name="description" content="Neural Style Transfer using PyTorch – blending images with iconic art styles. AI-generated art gallery.">
+  <!-- Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Anime.js for advanced animation -->
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
   <style>
     :root {
-      /* Masculine, elegant color palette */
-      --main-bg: linear-gradient(135deg, #f6f8fa 0%, #c7d0e5 60%, #495d7f 100%);
-      --accent-blue: #3a5fa9;
-      --accent-navy: #1e2a3a;
-      --accent-steel: #495d7f;
-      --accent-silver: #b0beca;
-      --accent-cobalt: #3571b7;
-      --text-main: #232c3d;
-      --text-light: #495d7f;
-      --text-white: #fff;
-      --card-bg: rgba(255,255,255,0.92);
-      --card-glass: blur(10px) saturate(1.12);
-      --card-shadow: 0 4px 32px #495d7f2a, 0 2px 16px #3a5fa91a;
-      --accent-gradient: linear-gradient(90deg, #3571b7 0%, #495d7f 100%);
-      --hover-gradient: linear-gradient(90deg, #dde4ee 0%, #b0beca 100%);
-      /* Button shadows */
+      --bg-grad-hero-1: #0F2027;
+      --bg-grad-hero-2: #203A43;
+      --bg-grad-hero-3: #2C5364;
+      --bg-grad-slide-1: #203A43;
+      --bg-grad-slide-2: #2C5364;
+      --card-bg: #1E1E1E;
+      --card-border: #2F2F2F;
+      --heading: #F0F0F0;
+      --body: #CCCCCC;
+      --button: #FFB400;
+      --button-hover: #FFD369;
+      --divider: #2C3E50;
+      --shadow1: 0 4px 28px rgba(0,0,0,0.23);
+      --shadow2: 0 8px 36px rgba(0,0,0,0.17);
     }
     html, body {
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
       min-height: 100vh;
-      width: 100vw;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-grad-hero-1), var(--bg-grad-hero-2), var(--bg-grad-hero-3));
+      color: var(--body);
       box-sizing: border-box;
-      font-family: 'Poppins', 'Space Grotesk', Arial, sans-serif;
-      background: var(--main-bg);
-      color: var(--text-main);
-      overflow-x: hidden;
-      scroll-behavior: smooth;
+      transition: background 1s cubic-bezier(.77,0,.18,1);
     }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 32px 10px 80px 10px;
-      z-index: 2;
-      position: relative;
+    body.bg-slide {
+      background: linear-gradient(135deg, var(--bg-grad-slide-1), var(--bg-grad-slide-2));
+      transition: background 1.4s cubic-bezier(.77,0,.18,1);
     }
-    /* Navigation */
-    .nav {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 2.8rem;
-      margin-top: 6px;
-    }
-    .nav-btn {
-      background: none;
-      border: none;
-      color: var(--accent-steel);
-      font-family: inherit;
-      font-size: 1.18rem;
-      font-weight: 700;
-      border-radius: 8px;
-      padding: 0.5rem 1.5rem;
-      cursor: pointer;
-      transition: background 0.15s, color 0.14s, box-shadow 0.13s;
-      outline: none;
-      letter-spacing: 0.02em;
-    }
-    .nav-btn.selected, .nav-btn:hover {
-      background: var(--accent-gradient);
-      color: var(--text-white);
-      box-shadow: 0 2px 16px #3a5fa933;
-    }
-
-    /* Hero Section */
+    /* HERO SECTION */
     .hero {
-      position: relative;
+      width: 100%;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 48px 0 28px 0;
-      min-height: 64vh;
-      z-index: 2;
-      overflow: visible;
-    }
-    .hero-bg-anim {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.4;
-      filter: blur(16px) brightness(1.08);
+      justify-content: center;
+      position: relative;
       overflow: hidden;
-      background: radial-gradient(ellipse at 60% 40%, #3a5fa933 0%, #495d7fcc 70%, #fff0 100%);
-      animation: hero-bg-move 14s ease-in-out infinite alternate;
+      background: linear-gradient(135deg, var(--bg-grad-hero-1), var(--bg-grad-hero-2), var(--bg-grad-hero-3));
+      background-size: 600% 600%;
+      animation: gradientShift 22s ease-in-out infinite;
+      text-align: center;
+      padding: 0 1rem;
+      z-index: 2;
     }
-    @keyframes hero-bg-move {
-      0% { background-position: 0% 0%;}
-      100% { background-position: 100% 80%;}
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hero-fidget-1, .hero-fidget-2, .hero-fidget-3 {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(6px);
+      animation: fidgetMove 12s infinite alternate cubic-bezier(.67,0,.19,1);
+    }
+    .hero-fidget-1 {
+      width: 320px; height: 320px;
+      left: 8vw; top: 8vh;
+      background: radial-gradient(circle at 30% 50%, #FFB400 0%, transparent 70%);
+      animation-delay: 0.3s;
+    }
+    .hero-fidget-2 {
+      width: 210px; height: 210px;
+      right: 9vw; top: 22vh;
+      background: radial-gradient(circle at 70% 30%, #FFD369 0%, transparent 75%);
+      animation-delay: 3s;
+    }
+    .hero-fidget-3 {
+      width: 260px; height: 260px;
+      left: 38vw; bottom: 8vh;
+      background: radial-gradient(circle at 60% 90%, #203A43 0%, transparent 80%);
+      animation-delay: 1.6s;
+    }
+    @keyframes fidgetMove {
+      0% {
+        transform: scale(1) translateY(0) translateX(0);
+        opacity: 0.13;
+      }
+      100% {
+        transform: scale(1.11) translateY(-18px) translateX(18px) rotate(10deg);
+        opacity: 0.22;
+      }
     }
     .hero-content {
       position: relative;
-      z-index: 2;
-      text-align: center;
-      max-width: 740px;
+      z-index: 1;
+      max-width: 680px;
       margin: 0 auto;
-      padding-bottom: 20px;
+      padding-top: 0.5em;
+      padding-bottom: 1.2em;
     }
     .title {
-      font-family: 'Space Grotesk', 'Poppins', Arial, sans-serif;
-      font-size: 2.6rem;
+      font-size: 2.8rem;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      background: var(--accent-gradient);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 2px 18px #3571b733;
-      margin-bottom: 0.7rem;
-      line-height: 1.08;
+      color: var(--heading);
+      letter-spacing: -1.2px;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      transform: translateY(18px);
     }
     .subtitle {
-      font-size: 1.18rem;
-      color: var(--accent-blue);
-      font-weight: 600;
+      font-size: 1.28rem;
+      color: var(--button);
       margin-bottom: 1.4rem;
-      letter-spacing: 0.01em;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transform: translateY(18px);
     }
-    .project-desc {
+    .hero-desc {
+      font-size: 1.09rem;
+      color: var(--body);
+      background: rgba(32,42,67,0.08);
+      border-radius: 10px;
+      padding: 1.2em 1.1em 1.1em 1.1em;
+      margin-bottom: 2.2em;
+      box-shadow: 0 2px 12px #171a1e18;
+      border: 1.5px solid #1C1C1C;
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    .cta {
+      background-color: var(--button);
+      color: #121212;
+      padding: 0.95rem 2.2rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
       font-size: 1.13rem;
-      color: var(--text-main);
-      margin: 0 auto 2.1rem auto;
-      max-width: 560px;
-      line-height: 1.6;
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
-      padding: 1.25em 1.5em;
-      box-shadow: 0 2px 10px #495d7f22;
-      backdrop-filter: var(--card-glass);
-      border: 1.3px solid #dde4ee;
-      font-family: 'Poppins', Arial, sans-serif;
-      transition: background 0.25s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      margin-top: 1.3rem;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+      outline: none;
+      opacity: 0;
+      transform: translateY(18px);
     }
-    .rive-anim-wrap {
+    .cta:hover, .cta:focus-visible {
+      background-color: var(--button-hover);
+      transform: scale(1.05);
+      box-shadow: 0 6px 22px rgba(255,180,0,0.16);
+    }
+    /* Section Divider */
+    .divider {
+      width: 100%;
+      height: 2px;
+      background: var(--divider);
+      margin: 0 auto 0 auto;
+      opacity: 0.56;
+    }
+
+    /* SLIDESHOW SECTION */
+    .slideshow-section {
+      width: 100%;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-bottom: 2.2rem;
-      min-height: 90px;
-      z-index: 1;
-      filter: drop-shadow(0 2px 24px #3571b7cc) brightness(1.07);
-    }
-    /* Gallery Section */
-    .output-gallery {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2.3rem;
       justify-content: center;
-      margin: 2.2rem 0 3rem 0;
+      background: transparent;
+      position: relative;
+      padding: 0;
+      transition: background 1s;
+      z-index: 1;
     }
-    .output-card {
+    .slideshow-window {
       background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: var(--card-shadow);
-      padding: 1.2rem 1rem 1.6rem 1rem;
-      min-width: 240px;
-      max-width: 325px;
-      flex: 1 1 290px;
+      border-radius: 18px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: var(--shadow1);
+      width: 100vw;
+      min-height: 410px;
+      margin: 0; /* Remove horizontal margin for flush fit */
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       position: relative;
-      overflow: hidden;
-      transition: box-shadow 0.16s, transform 0.19s, background 0.21s;
-      backdrop-filter: var(--card-glass);
-      border: 1.2px solid #dde4ee;
+      transition: box-shadow 0.3s, background 1s;
     }
-    .output-card:hover {
-      background: var(--hover-gradient);
-      box-shadow: 0 8px 36px #3a5fa999, 0 2px 12px #495d7f88;
-      transform: translateY(-6px) scale(1.035);
-      border: 1.8px solid var(--accent-cobalt);
-    }
-    .output-imgs {
-      display: flex;
-      gap: 0.7rem;
-      margin-bottom: 1.1rem;
-      align-items: center;
-    }
-    .out-img {
-      width: 84px;
-      height: 84px;
-      object-fit: cover;
-      border-radius: 10px;
-      background: #dde4ee;
-      border: 2.3px solid #b0beca;
-      box-shadow: 0 2px 8px #495d7f33;
-      transition: box-shadow 0.13s;
-    }
-    .output-card:hover .out-img {
-      box-shadow: 0 6px 24px #3571b7cc;
-    }
-    .out-arrow {
-      font-size: 2.1rem;
-      color: var(--accent-cobalt);
-      align-self: center;
-      margin: 0 0.14rem;
-      text-shadow: 0 2px 8px #495d7f44;
-    }
-    .card-caption {
-      text-align: center;
-      color: var(--accent-steel);
-      font-size: 1.07rem;
-      margin-top: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.1px;
-      min-height: 2.3em;
-    }
-    /* Responsive Grid */
-    @media (max-width: 700px) {
-      .container { max-width: 100vw; padding: 4vw 0 90px 0; }
-      .output-gallery { flex-direction: column; gap: 1.5rem; }
-      .output-card { max-width: 98vw; min-width: 0; }
-      .out-img { width: 61px; height: 61px;}
-    }
-    @media (max-width: 480px) {
-      .title { font-size: 1.3rem; }
-      .project-desc { font-size: 1.01rem; padding: 0.9em 0.7em;}
-      .nav-btn { font-size: 0.97rem;}
-    }
-    /* Footer styles */
-    .footer {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
+    .slideshow-inner {
       width: 100%;
-      padding: 22px 0 18px 0;
-      background: rgba(255,255,255,0.94);
-      color: var(--text-main);
-      font-size: 1.18rem;
-      text-align: center;
-      letter-spacing: 0.2px;
-      font-weight: 600;
-      z-index: 20;
-      box-shadow: 0 -2px 18px #495d7f22;
-      border-top: 1.5px solid #dde4ee55;
-      backdrop-filter: blur(6px) saturate(1.03);
-    }
-    .footer-btn {
-      display: inline-flex;
+      display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 0.5em;
-      background: var(--accent-gradient);
-      color: #fff;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: 1.13rem;
-      border: none;
+      padding: 3.1rem 1.6rem 1.1rem 1.6rem;
+      min-height: 285px;
+      box-sizing: border-box;
+      gap: 3.2rem;
+      position: relative;
+    }
+    .slide-img-group {
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .slide-img {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
       border-radius: 16px;
-      padding: 0.75em 1.7em;
-      margin-top: 0.5em;
-      cursor: pointer;
-      box-shadow: 0 2px 10px #495d7f22;
-      text-decoration: none;
-      transition: background 0.15s, box-shadow 0.16s, transform 0.15s;
-      letter-spacing: 0.01em;
+      border: 3px solid var(--card-border);
+      background: #23272f;
+      box-shadow: 0 4px 20px #222b3350;
+      transition: transform 0.5s cubic-bezier(.23,1.2,.32,1), box-shadow 0.2s;
+      opacity: 0.97;
     }
-    .footer-btn:hover, .footer-btn:focus {
-      background: linear-gradient(90deg, #495d7f 0%, #3571b7 100%);
-      box-shadow: 0 4px 16px #3a5fa9cc;
-      color: #fff;
-      transform: scale(1.04);
-      text-decoration: none;
+    .slide-img:not(:last-child) {
+      margin-right: 0.4rem;
     }
-    .footer-btn svg {
-      width: 1.23em;
-      height: 1.23em;
-      margin-bottom: -0.11em;
-      fill: currentColor;
+    .slide-img:hover, .slide-img:focus-visible {
+      transform: scale(1.06);
+      box-shadow: var(--shadow2);
+      border-color: var(--button-hover);
+    }
+    .slide-arrow {
+      font-size: 2.3rem;
+      color: var(--button);
+      margin: 0 0.5rem;
+      font-weight: 700;
+      user-select: none;
+      opacity: 0.89;
+      text-shadow: 0 1px 7px #FFB40022;
+    }
+    .slide-caption {
+      font-size: 1.13rem;
+      color: var(--body);
+      margin-top: 2.0rem;
+      text-align: center;
+      font-weight: 400;
+      opacity: 0.88;
+      min-height: 2.2em;
+      letter-spacing: 0.03em;
+    }
+    .slideshow-indicators {
+      display: flex;
+      gap: 1.1em;
+      margin: 1.1em 0 0 0;
+      justify-content: center;
+      align-items: center;
+    }
+    .slideshow-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--card-border);
+      opacity: 0.6;
+      transition: background 0.3s, opacity 0.3s;
+      border: none;
+      outline: none;
+    }
+    .slideshow-dot.active {
+      background: var(--button);
+      opacity: 1;
+      box-shadow: 0 0 0 2px var(--button-hover);
+    }
+    /* Fade/Slide Animation for Slideshow */
+    .slideshow-fade {
+      animation: fadeSlideIn 0.7s cubic-bezier(.23,1.2,.32,1);
+    }
+    @keyframes fadeSlideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    /* FOOTER */
+    .footer {
+      width: 100vw;
+      padding: 20px 0 15px 0;
+      background: #181F2A;
+      color: var(--body);
+      text-align: center;
+      font-size: 1.08rem;
+      font-weight: 600;
+      border-top: 1.5px solid var(--divider);
+      margin-top: 3rem;
+      letter-spacing: 0.05em;
+      opacity: 0.98;
+    }
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .slideshow-window { max-width: 99vw;}
+      .slide-img { width: 140px; height: 140px;}
+      .slideshow-inner { gap: 1.2rem; }
+    }
+    @media (max-width: 700px) {
+      .slide-img { width: 77px; height: 77px;}
+      .slideshow-inner { gap: 0.5rem; padding: 0.7rem 0.1rem 1.2rem 0.1rem; min-height: 80px;}
+      .slideshow-window { min-height: 0; }
+    }
+    @media (max-width: 500px) {
+      .title { font-size: 1.13rem;}
+      .slide-caption { font-size: 0.92rem;}
+      .footer { font-size: 0.98rem;}
+    }
+    /* Accessibility: focus outlines */
+    .cta:focus-visible, .slide-img:focus-visible, .slideshow-dot:focus-visible {
+      outline: 2px solid var(--button-hover);
+      outline-offset: 2px;
+      z-index: 3;
     }
   </style>
 </head>
 <body>
-<div id="root"></div>
+  <!-- HERO SECTION -->
+  <section class="hero" id="hero">
+    <div class="hero-fidget-1"></div>
+    <div class="hero-fidget-2"></div>
+    <div class="hero-fidget-3"></div>
+    <div class="hero-content">
+      <h1 class="title">By Manas Ranjan Jena</h1>
+      <div class="subtitle">Neural Style Transfer: Where Deep Learning Meets Art</div>
+      <div class="hero-desc">
+        This project uses Neural Style Transfer to blend the content of everyday images with the style of iconic artworks—transforming simple visuals into stunning digital art. While the model itself is GPU-intensive and cannot run live here, the showcased outputs are generated offline and curated to highlight the magic of deep neural networks in recreating artistic expression.
+      </div>
+      <button class="cta" id="viewResultsBtn">
+        View Results
+      </button>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <!-- SLIDESHOW SECTION -->
+  <section class="slideshow-section" id="slideshow">
+    <div class="slideshow-window">
+      <div class="slideshow-inner" id="slideshowInner">
+        <!-- JS injects images here -->
+      </div>
+      <div class="slide-caption" id="slideCaption"></div>
+      <div class="slideshow-indicators" id="slideshowIndicators"></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <!-- FOOTER -->
 <div class="footer">
-  <a class="footer-btn" href="https://github.com/ManasRanjanJena253/Neural_Style_Transfer" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0.297c-6.626 0-12 5.373-12 12 0 5.304 3.438 9.799 8.205 11.387 0.6 0.111 0.82-0.261 0.82-0.577 0-0.285-0.011-1.04-0.016-2.04-3.338 0.726-4.042-1.612-4.042-1.612-0.546-1.387-1.332-1.756-1.332-1.756-1.088-0.744 0.082-0.729 0.082-0.729 1.205 0.084 1.84 1.238 1.84 1.238 1.07 1.834 2.807 1.304 3.492 0.997 0.107-0.775 0.418-1.304 0.761-1.604-2.665-0.304-5.466-1.334-5.466-5.933 0-1.311 0.469-2.382 1.236-3.222-0.124-0.303-0.535-1.521 0.117-3.176 0 0 1.008-0.322 3.301 1.23 0.957-0.266 1.984-0.398 3.003-0.403 1.018 0.005 2.046 0.137 3.006 0.403 2.289-1.553 3.295-1.23 3.295-1.23 0.655 1.655 0.244 2.873 0.12 3.176 0.77 0.84 1.235 1.911 1.235 3.222 0 4.609-2.804 5.625-5.475 5.921 0.43 0.372 0.814 1.104 0.814 2.227 0 1.609-0.014 2.906-0.014 3.299 0 0.32 0.216 0.694 0.825 0.576 4.765-1.589 8.199-6.083 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-    View Source on GitHub
+  &copy; 2025 Manas Ranjan Jena &mdash; Neural Style Transfer Demo
+  <a
+    href="https://github.com/ManasRanjanJena253/Neural_Style_Transfer"
+    target="_blank"
+    rel="noopener"
+    class="footer-btn"
+    style="
+      display: inline-block;
+      margin-left: 1.8em;
+      background: var(--button, #FFB400);
+      color: #181F2A;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      padding: 0.52em 1.5em;
+      font-size: 1em;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s, box-shadow 0.23s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      vertical-align: middle;
+    "
+    onmouseover="this.style.background='#FFD369';this.style.color='#222';"
+    onmouseout="this.style.background='var(--button, #FFB400)';this.style.color='#181F2A';"
+  >
+    View on GitHub
   </a>
 </div>
-<script type="text/babel">
+  <script>
+    // NST Results Data
+    const OUTPUTS = [
+      {
+        content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
+        style: "Neural_Style_Transfer_Model/Styles/Style 1.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_1_scenery.png",
+        caption: "Style transferred from style1.jpg to content1.jpg"
+      },
+      {
+        content: "Neural_Style_Transfer_Model/Images/Cat.png",
+        style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Cat.png",
+        caption: "Style transferred from style3.jpg to content2.jpg"
+      },
+      {
+        content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
+        style: "Neural_Style_Transfer_Model/Styles/Style 2.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_2_scenery.png",
+        caption: "Style transferred from style2.jpg to content3.jpg"
+      },
+      {
+        content: "Neural_Style_Transfer_Model/Images/Face.jpg",
+        style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Face.png",
+        caption: "Style transferred from style3.jpg to content4.jpg"
+      },
+      {
+        content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
+        style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Scenery.png",
+        caption: "Style transferred from style3.jpg to content5.jpg"
+      },
+      {
+        content: "Neural_Style_Transfer_Model/Images/Cat.png",
+        style: "Neural_Style_Transfer_Model/Styles/Style 2.png",
+        result: "Neural_Style_Transfer_Model/Output_Image/Style_2_Cat.png",
+        caption: "Style transferred from style2.jpg to content6.jpg"
+      }
+    ];
+    // Fallback images (Unsplash)
+    const PLACEHOLDER_CONTENT = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=150&q=80";
+    const PLACEHOLDER_STYLE = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=150&q=80";
+    const PLACEHOLDER_RESULT = "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=150&q=80";
 
-// --- Fix: Use absolute URLs or demo placeholder images for working demo ---
-// If running locally, ensure 'Neural_Style_Transfer_Model/Images/...' exist in the public directory.
-// Otherwise, use placeholder images for demo:
-const PLACEHOLDER_CONTENT = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=150&q=80";
-const PLACEHOLDER_STYLE = "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=150&q=80";
-const PLACEHOLDER_RESULT = "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=150&q=80";
+    // SlideShow Logic
+    let currentSlide = 0, timer = null;
+    const DURATION = 2300; // ms (faster)
+    let transitioning = false;
 
-// Use your own images if available, else fallback to placeholders
-function safeImg(src, fallback) {
-  // Use fetch to check if image exists? Not possible cross-origin. Just use fallback if src is empty.
-  return src || fallback;
-}
+    function handleImgError(img, fallback) {
+      img.onerror = null;
+      img.src = fallback;
+    }
 
-const OUTPUTS = [
-  {
-    content: "Neural_Style_Transfer_Model/Images/Cat.png",
-    style: "Neural_Style_Transfer_Model/Styles/Style 1.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_1_scenery.png",
-    caption: "Style transferred from style1.jpg to content1.jpg"
-  },
-  {
-    content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
-    style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Cat.png",
-    caption: "Style transferred from style3.jpg to content2.jpg"
-  },
-  {
-    content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
-    style: "Neural_Style_Transfer_Model/Styles/Style 2.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_2_scenery.png",
-    caption: "Style transferred from style2.jpg to content3.jpg"
-  },
-  {
-    content: "Neural_Style_Transfer_Model/Images/Face.jpg",
-    style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Face.png",
-    caption: "Style transferred from style3.jpg to content4.jpg"
-  },
-  {
-    content: "Neural_Style_Transfer_Model/Images/Scenery.jpg",
-    style: "Neural_Style_Transfer_Model/Styles/Style 3.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_3_Scenery.png",
-    caption: "Style transferred from style3.jpg to content5.jpg"
-  },
-  {
-    content: "Neural_Style_Transfer_Model/Images/Cat.png",
-    style: "Neural_Style_Transfer_Model/Styles/Style 2.png",
-    result: "Neural_Style_Transfer_Model/Output_Image/Style_2_Cat.png",
-    caption: "Style transferred from style2.jpg to content6.jpg"
-  }
-];
+    function renderSlide(index) {
+      const data = OUTPUTS[index];
+      const inner = document.getElementById('slideshowInner');
+      const caption = document.getElementById('slideCaption');
+      inner.innerHTML = '';
 
-function imageExists(src, onSuccess, onError) {
-  const img = new window.Image();
-  img.onload = onSuccess;
-  img.onerror = onError;
-  img.src = src;
-}
+      // Slide group
+      const group = document.createElement('div');
+      group.className = 'slide-img-group slideshow-fade';
 
-//Rive animation
-function RiveAnim({ src, artboard, stateMachines, style }) {
-  const ref = React.useRef();
-  React.useEffect(() => {
-    let riveInstance;
-    if (ref.current) {
-      riveInstance = new rive.Rive({
-        src,
-        canvas: ref.current,
-        artboard,
-        stateMachines,
-        autoplay: true
+      // Content img
+      const imgContent = document.createElement('img');
+      imgContent.className = 'slide-img content';
+      imgContent.src = data.content;
+      imgContent.alt = 'Content image for style transfer';
+      imgContent.onerror = () => handleImgError(imgContent, PLACEHOLDER_CONTENT);
+      imgContent.tabIndex = 0;
+
+      // Style img
+      const imgStyle = document.createElement('img');
+      imgStyle.className = 'slide-img style';
+      imgStyle.src = data.style;
+      imgStyle.alt = 'Style image for style transfer';
+      imgStyle.onerror = () => handleImgError(imgStyle, PLACEHOLDER_STYLE);
+      imgStyle.tabIndex = 0;
+
+      // Result img
+      const imgResult = document.createElement('img');
+      imgResult.className = 'slide-img result';
+      imgResult.src = data.result;
+      imgResult.alt = 'Result of style transfer';
+      imgResult.onerror = () => handleImgError(imgResult, PLACEHOLDER_RESULT);
+      imgResult.tabIndex = 0;
+
+      // Arrows
+      const plus = document.createElement('span');
+      plus.className = 'slide-arrow';
+      plus.textContent = '+';
+
+      const arrow = document.createElement('span');
+      arrow.className = 'slide-arrow';
+      arrow.textContent = '→';
+
+      group.appendChild(imgContent);
+      group.appendChild(plus);
+      group.appendChild(imgStyle);
+      group.appendChild(arrow);
+      group.appendChild(imgResult);
+
+      inner.appendChild(group);
+      caption.textContent = data.caption;
+
+      // Update dots
+      updateIndicators(index);
+
+      // Animate slide-in with anime.js for more subtle effect
+      anime({
+        targets: group,
+        opacity: [0, 1],
+        translateY: [32, 0],
+        scale: [0.96, 1],
+        easing: "easeOutCubic",
+        duration: 720
       });
-      // Subtle interactivity: play/pause on hover
-      if (ref.current.parentNode) {
-        ref.current.parentNode.onmouseenter = () => riveInstance && riveInstance.play();
-        ref.current.parentNode.onmouseleave = () => riveInstance && riveInstance.pause();
+    }
+
+    function updateIndicators(idx) {
+      const indicators = document.getElementById('slideshowIndicators');
+      indicators.innerHTML = '';
+      for (let i = 0; i < OUTPUTS.length; ++i) {
+        const dot = document.createElement('button');
+        dot.className = 'slideshow-dot' + (i === idx ? ' active' : '');
+        dot.tabIndex = 0;
+        dot.setAttribute('aria-label', 'Show example ' + (i + 1));
+        dot.onclick = () => goToSlide(i, true);
+        indicators.appendChild(dot);
       }
     }
-    return () => { riveInstance && riveInstance.cleanup && riveInstance.cleanup(); };
-  }, [src, artboard, stateMachines]);
-  return <canvas ref={ref} width={180} height={78} style={style}/>;
-}
 
-// --- Pages ---
-function HomePage() {
-  return (
-    <section className="hero">
-      <div className="hero-bg-anim"></div>
-      <div className="rive-anim-wrap">
-        <RiveAnim
-          src="https://public.rive.app/community/runtime-files/2105-1572-paint-brush.riv"
-          artboard="Paint"
-          stateMachines="State Machine 1"
-          style={{width:150, height:70}}
-        />
-      </div>
-      <div className="hero-content">
-        <h1 className="title">
-          Neural Style Transfer: Where Deep Learning Meets Art
-        </h1>
-        <div className="subtitle">
-          Explore the artistic fusion of AI and imagination
-        </div>
-        <div className="project-desc">
-          This project uses Neural Style Transfer to blend the content of everyday images with the style of iconic artworks—transforming simple visuals into stunning digital art. While the model itself is GPU-intensive and cannot run live here, the showcased outputs are generated offline and curated to highlight the magic of deep neural networks in recreating artistic expression.
-        </div>
-      </div>
-    </section>
-  );
-}
+    function nextSlide() {
+      if (transitioning) return;
+      transitioning = true;
+      currentSlide = (currentSlide + 1) % OUTPUTS.length;
+      renderSlide(currentSlide);
+      setTimeout(() => { transitioning = false; }, 500);
+    }
+    function goToSlide(idx, manual=false) {
+      if (transitioning) return;
+      transitioning = true;
+      currentSlide = idx;
+      renderSlide(currentSlide);
+      setTimeout(() => { transitioning = false; }, 500);
+      if (manual) {
+        clearTimeout(timer);
+        timer = setTimeout(nextSlide, DURATION);
+      }
+    }
 
-function ShowcasePage() {
-  // Show images, if not found show placeholders
-  // We'll use useState to cache which ones fail
-  const [failures, setFailures] = React.useState({});
+    // Start Slideshow
+    function startSlideshow() {
+      renderSlide(currentSlide);
+      timer = setInterval(nextSlide, DURATION);
+    }
+    // Pause on hover/focus for accessibility
+    document.addEventListener('DOMContentLoaded', () => {
+      // Home page text animation (anime.js)
+      anime.timeline()
+        .add({ targets: '.title', opacity: [0, 1], translateY: [18, 0], duration: 820, easing: 'easeOutCubic' })
+        .add({ targets: '.subtitle', opacity: [0, 1], translateY: [18, 0], offset: '-=520', duration: 740, easing: 'easeOutCubic' })
+        .add({ targets: '.hero-desc', opacity: [0, 1], translateY: [18, 0], offset: '-=420', duration: 680, easing: 'easeOutCubic' })
+        .add({ targets: '.cta', opacity: [0, 1], translateY: [18, 0], offset: '-=360', duration: 600, delay: 160, easing: 'easeOutCubic' });
 
-  function getImg(src, fallback, key) {
-    if (failures[key]) return fallback;
-    return src;
-  }
+      // Hero section floating/fidgeted blobs (anime.js infinite loops)
+      anime({
+        targets: '.hero-fidget-1',
+        translateY: [
+          { value: -18, duration: 3200, easing: 'easeInOutCubic' },
+          { value: 0, duration: 3200, easing: 'easeInOutCubic' }
+        ],
+        direction: 'alternate',
+        loop: true
+      });
+      anime({
+        targets: '.hero-fidget-2',
+        translateY: [
+          { value: 14, duration: 2600, easing: 'easeInOutCubic' },
+          { value: 0, duration: 2600, easing: 'easeInOutCubic' }
+        ],
+        direction: 'alternate',
+        loop: true
+      });
+      anime({
+        targets: '.hero-fidget-3',
+        translateX: [
+          { value: 28, duration: 4000, easing: 'easeInOutCubic' },
+          { value: 0, duration: 4000, easing: 'easeInOutCubic' }
+        ],
+        direction: 'alternate',
+        loop: true
+      });
 
-  function handleImgError(key) {
-    setFailures(f => ({ ...f, [key]: true }));
-  }
+      // Slideshow and background blending
+      startSlideshow();
 
-  React.useEffect(() => {
-    // Animate cards in
-    document.querySelectorAll('.output-card').forEach((el, i) => {
-      el.style.opacity = 0;
-      el.style.transform = 'translateY(35px) scale(0.97)';
-      setTimeout(() => {
-        el.style.transition = 'opacity 0.7s cubic-bezier(.23,1.2,.32,1), transform 0.7s cubic-bezier(.23,1.2,.32,1)';
-        el.style.opacity = 1;
-        el.style.transform = 'translateY(0) scale(1)';
-      }, 80 + i * 110);
+      // Merge background colors on View Results click
+      document.getElementById('viewResultsBtn').addEventListener('click', () => {
+        // Animate body background for subtle transition
+        document.body.classList.add('bg-slide');
+        // Optional: scroll after a short delay to allow bg to start animating
+        setTimeout(() => {
+          document.getElementById('slideshow').scrollIntoView({behavior:'smooth'});
+        }, 200);
+      });
+
+      // Pause/resume slideshow on hover/focus for accessibility
+      const windowEl = document.querySelector('.slideshow-window');
+      windowEl.addEventListener('mouseenter', () => clearInterval(timer));
+      windowEl.addEventListener('mouseleave', () => { clearInterval(timer); timer = setInterval(nextSlide, DURATION); });
+      windowEl.addEventListener('focusin', () => clearInterval(timer));
+      windowEl.addEventListener('focusout', () => { clearInterval(timer); timer = setInterval(nextSlide, DURATION); });
     });
-  }, []);
-  return (
-    <div>
-      <h1 className="title" style={{fontSize:"2.1rem", marginBottom: "0.9rem"}}>Showcase Results</h1>
-      <div className="subtitle" style={{marginBottom:"1.5rem"}}>See how content images are transformed by different styles!</div>
-      <div className="output-gallery">
-        {OUTPUTS.map((out, idx) => (
-          <div className="output-card" key={idx}>
-            <div className="output-imgs">
-              <img
-                src={getImg(out.content, PLACEHOLDER_CONTENT, `c${idx}`)}
-                className="out-img"
-                alt="Content"
-                onError={() => handleImgError(`c${idx}`)}
-              />
-              <span className="out-arrow" title="plus style">&#43;</span>
-              <img
-                src={getImg(out.style, PLACEHOLDER_STYLE, `s${idx}`)}
-                className="out-img"
-                alt="Style"
-                onError={() => handleImgError(`s${idx}`)}
-              />
-              <span className="out-arrow" title="yields result">&#8594;</span>
-              <img
-                src={getImg(out.result, PLACEHOLDER_RESULT, `r${idx}`)}
-                className="out-img"
-                alt="Result"
-                onError={() => handleImgError(`r${idx}`)}
-              />
-            </div>
-            <div className="card-caption">{out.caption}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{
-        textAlign:'center',
-        color:'var(--accent-steel)',
-        fontSize:'1.04rem',
-        marginTop:'1.7rem'
-      }}>
-        Want to try on your own images? Clone this repo and use the model locally!
-      </div>
-    </div>
-  );
-}
-
-function AboutPage() {
-  return (
-    <div>
-      <h1 className="title" style={{fontSize:"2.1rem", marginBottom: "1.1rem"}}>About This Project</h1>
-      <div className="project-desc" style={{maxWidth:"600px", margin:"0 auto", fontSize:"1.07rem", color: "var(--text-main)"}}>
-        <b>Neural Style Transfer</b> (NST) uses deep convolutional neural networks to recompose a content image in the style of another image—often a famous painting. <br/><br/>
-        <b>How it works:</b>
-        <ul style={{
-          color: "var(--accent-cobalt)",
-          textAlign: "left",
-          margin: "1rem auto",
-          maxWidth: "420px",
-          fontSize: "1.04rem",
-          lineHeight: 1.65,
-          paddingLeft: "1.15em"
-        }}>
-          <li>Both content and style images are processed by a pre-trained CNN (typically VGG19).</li>
-          <li>Style and content losses are defined over feature maps.</li>
-          <li>The output image is iteratively optimized to minimize both losses, blending content and style.</li>
-        </ul>
-        <span style={{color:"var(--accent-blue)", fontWeight:600}}>Explore the code or run locally via the GitHub repo!</span>
-      </div>
-    </div>
-  );
-}
-
-// App shell with navigation
-function App() {
-  const [page, setPage] = React.useState('home');
-  return (
-    <div className="container">
-      <div className="nav">
-        <button className={`nav-btn ${page === 'home' ? 'selected' : ''}`}
-                onClick={() => setPage('home')}>
-          Home
-        </button>
-        <button className={`nav-btn ${page === 'showcase' ? 'selected' : ''}`}
-                onClick={() => setPage('showcase')}>
-          Showcase
-        </button>
-        <button className={`nav-btn ${page === 'about' ? 'selected' : ''}`}
-                onClick={() => setPage('about')}>
-          About
-        </button>
-      </div>
-      {page === 'home' && <HomePage />}
-      {page === 'showcase' && <ShowcasePage />}
-      {page === 'about' && <AboutPage />}
-    </div>
-  );
-}
-
-// Render
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-</script>
+  </script>
 </body>
 </html>
