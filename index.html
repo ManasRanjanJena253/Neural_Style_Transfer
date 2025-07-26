@@ -357,13 +357,13 @@ function imageExists(src, onSuccess, onError) {
   img.src = src;
 }
 
-// -- Rive animation loader --
+//Rive animation
 function RiveAnim({ src, artboard, stateMachines, style }) {
   const ref = React.useRef();
   React.useEffect(() => {
     let riveInstance;
     if (ref.current) {
-      riveInstance = new window.Rive({
+      riveInstance = new rive.Rive({
         src,
         canvas: ref.current,
         artboard,
